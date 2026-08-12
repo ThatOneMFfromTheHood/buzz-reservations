@@ -1,5 +1,11 @@
 # BUZZ Reservations — прототип модуля бронирования столов
 
+**Прод:** https://buzz-reservations-andrahap07-2168s-projects.vercel.app (Vercel: Angular статикой,
+FastAPI — serverless-функция `/api`, БД — Supabase Postgres, схема `buzz`).
+Serverless-функция при холодном старте подтягивает `backend/app` из этого репозитория (ветка main),
+поэтому обновление API на проде = push в main + новый деплой фронта не требуется.
+Секрет подключения к БД живёт только в Vercel-бандле (`api/_config.py`, в git не попадает).
+
 Реализация ТЗ «BUZZ Table Reservations»: Python (FastAPI) backend + Angular (TypeScript) фронт
 (white-label виджет + экраны админ-панели). Уровень доступности — «столы с вместимостью»,
 без плана зала и объединения столов (v1).
