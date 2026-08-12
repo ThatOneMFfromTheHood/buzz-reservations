@@ -1,0 +1,265 @@
+@if (!authed()) {
+  <div class="a-login">
+    <div class="a-login-card">
+      <h1>BUZZ · Бронирование</h1>
+      <p>Расширение админ-панели ресторана. Введите админ-токен (прототип: <code>dev-admin</code>).</p>
+      <input class="a-input" [(ngModel)]="tokenInput" placeholder="Админ-токен"
+             (keyup.enter)="saveToken()" />
+      <button class="a-btn primary" (click)="saveToken()">Войти</button>
+    </div>
+  </div>
+} @else {
+  <div class="a-shell">
+    <aside class="a-sidebar">
+      <div class="a-brand">BUZZ <span>Reservations</span></div>
+
+      <label class="a-venue-label">Заведение</label>
+      <select class="a-input" [ngModel]="venueId()" (ngModelChange)="pickVenue($event)">
+        @for (v of venues(); track v.id) {
+          <option [ngValue]="v.id">{{ v.name }}</option>
+        }
+      </select>
+
+      <nav class="a-nav">
+        <button [class.active]="tab() === 'reservations'" (click)="setTab('reservations')">📋 Брони</button>
+        <button [class.active]="tab() === 'tables'" (click)="setTab('tables')">🪑 Столы</button>
+        <button [class.active]="tab() === 'hours'" (click)="setTab('hours')">🕐 Часы</button>
+        <button [class.active]="tab() === 'settings'" (click)="setTab('settings')">⚙️ Настройки</button>
+        <button [class.active]="tab() === 'widget'" (click)="setTab('widget')">🎨 Виджет</button>
+      </nav>
+
+      <button class="a-logout" (click)="logout()">Выйти</button>
+    </aside>
+
+    <main class="a-main">
+      @if (toast()) { <div class="a-toast">{{ toast() }}</div> }
+      @if (error()) { <div class="a-toast error">{{ error() }}</div> }
+
+      @switch (tab()) {
+
+        <!-- ==================== БРОНИ ==================== -->
+        @case ('reservations') {
+          <h1 class="a-h1">Брони</h1>
+          <div class="a-filters">
+            <label>Дата <input class="a-input" type="date" [(ngModel)]="filterDate" (change)="loadReservations()" /></label>
+            <label>Статус
+              <select class="a-input" [(ngModel)]="filterStatus" (change)="loadReservations()">
+                <option value="">все</option>
+                @for (s of ['pending','confirmed','cancelled_by_guest','cancelled_by_venue','no_show','completed']; track s) {
+                  <option [value]="s">{{ statusRu[s] }}</option>
+                }
+              </select>
+            </label>
+            <button class="a-btn" (click)="filterDate=''; loadReservations()">Все даты</button>
+          </div>
+
+          @if (reservations().length === 0) {
+            <p class="a-empty">Броней нет</p>
+          } @else {
+            <table class="a-table">
+              <thead>
+                <tr>
+                  <th>Когда</th><th>Гость</th><th>Контакты</th><th>Гостей</th>
+                  <th>Стол</th><th>Код</th><th>Статус</th><th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of reservations(); track r.id) {
+                  <tr [class.pending-row]="r.status === 'pending'">
+                    <td>{{ resTime(r) }}</td>
+                    <td>
+                      {{ r.guest_name }}
+                      @if (r.special_request) { <div class="a-note">💬 {{ r.special_request }}</div> }
+                    </td>
+                    <td class="a-contacts">{{ r.guest_phone }}<br />{{ r.guest_email }}</td>
+                    <td>{{ r.party_size }}</td>
+                    <td>{{ tableLabel(r) }}</td>
+                    <td><code>{{ r.confirmation_code }}</code></td>
+                    <td><span class="a-badge" [attr.data-status]="r.status">{{ statusRu[r.status] }}</span></td>
+                    <td class="a-actions">
+                      @if (r.status === 'pending') {
+                        <button class="a-btn small primary" (click)="confirmRes(r)">Подтвердить</button>
+                        <button class="a-btn small danger" (click)="declineRes(r)">Отклонить</button>
+                      }
+                      @if (r.status === 'confirmed') {
+                        <button class="a-btn small" (click)="noShowRes(r)">No-show</button>
+                        <button class="a-btn small danger" (click)="declineRes(r)">Отменить</button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        }
+
+        <!-- ==================== СТОЛЫ ==================== -->
+        @case ('tables') {
+          <h1 class="a-h1">Столы</h1>
+          <table class="a-table">
+            <thead>
+              <tr><th>Название</th><th>Вместимость</th><th>Зона</th><th>Активен</th><th>Онлайн-бронь</th><th></th></tr>
+            </thead>
+            <tbody>
+              @for (t of tables(); track t.id) {
+                <tr>
+                  <td><input class="a-input" [(ngModel)]="t.name" /></td>
+                  <td><input class="a-input num" type="number" min="1" [(ngModel)]="t.capacity" /></td>
+                  <td><input class="a-input" [(ngModel)]="t.area" placeholder="—" /></td>
+                  <td><input type="checkbox" [(ngModel)]="t.is_active" /></td>
+                  <td><input type="checkbox" [(ngModel)]="t.is_bookable" /></td>
+                  <td class="a-actions">
+                    <button class="a-btn small" (click)="saveTable(t)">Сохранить</button>
+                    <button class="a-btn small danger" (click)="deleteTable(t)">✕</button>
+                  </td>
+                </tr>
+              }
+              <tr class="a-new-row">
+                <td><input class="a-input" [(ngModel)]="newTable.name" placeholder="T8 / Терраса-3" /></td>
+                <td><input class="a-input num" type="number" min="1" [(ngModel)]="newTable.capacity" /></td>
+                <td><input class="a-input" [(ngModel)]="newTable.area" placeholder="зал / терраса" /></td>
+                <td colspan="2"></td>
+                <td><button class="a-btn small primary" (click)="addTable()">+ Добавить</button></td>
+              </tr>
+            </tbody>
+          </table>
+        }
+
+        <!-- ==================== ЧАСЫ ==================== -->
+        @case ('hours') {
+          <h1 class="a-h1">Часы доступности брони</h1>
+          <p class="a-hint">Несколько интервалов в день = раздельные обед/ужин.</p>
+
+          @for (wd of [0,1,2,3,4,5,6]; track wd) {
+            <div class="a-hours-row">
+              <span class="a-weekday">{{ weekdays[wd] }}</span>
+              <div class="a-intervals">
+                @for (h of hoursFor(wd); track $index) {
+                  <span class="a-interval">
+                    <input class="a-input time" type="time" [(ngModel)]="h.open_time" />
+                    —
+                    <input class="a-input time" type="time" [(ngModel)]="h.close_time" />
+                    <button class="a-btn small danger" (click)="removeInterval(h)">✕</button>
+                  </span>
+                }
+                @if (hoursFor(wd).length === 0) { <span class="a-closed">закрыто</span> }
+                <button class="a-btn small" (click)="addInterval(wd)">+ интервал</button>
+              </div>
+            </div>
+          }
+          <button class="a-btn primary" (click)="saveHours()">Сохранить часы</button>
+
+          <h2 class="a-h2">Исключения (праздники, спецдни)</h2>
+          @for (o of overrides(); track $index) {
+            <div class="a-override">
+              <strong>{{ o.date }}</strong>
+              @if (o.is_closed) { <span class="a-closed">закрыто</span> }
+              @else { <span>{{ o.open_time }} — {{ o.close_time }}</span> }
+              <button class="a-btn small danger" (click)="removeOverride(o)">✕</button>
+            </div>
+          }
+          <div class="a-override new">
+            <input class="a-input" type="date" [(ngModel)]="newOverride.date" />
+            <label><input type="checkbox" [(ngModel)]="newOverride.is_closed" /> закрыто</label>
+            @if (!newOverride.is_closed) {
+              <input class="a-input time" type="time" [(ngModel)]="newOverride.open_time" />
+              —
+              <input class="a-input time" type="time" [(ngModel)]="newOverride.close_time" />
+            }
+            <button class="a-btn small primary" (click)="addOverride()">+ Добавить</button>
+          </div>
+        }
+
+        <!-- ==================== НАСТРОЙКИ ==================== -->
+        @case ('settings') {
+          <h1 class="a-h1">Настройки бронирования</h1>
+          @if (settings(); as s) {
+            <div class="a-form">
+              <label class="a-check">
+                <input type="checkbox" [(ngModel)]="s.booking_enabled" />
+                Онлайн-бронирование включено
+              </label>
+
+              <label>Подтверждение
+                <select class="a-input" [(ngModel)]="s.confirmation_mode">
+                  <option value="auto">автоматическое</option>
+                  <option value="manual">вручную рестораном</option>
+                </select>
+              </label>
+
+              <div class="a-grid2">
+                <label>Длительность брони, мин
+                  <input class="a-input" type="number" step="15" [(ngModel)]="s.booking_duration_min" /></label>
+                <label>Шаг сетки, мин
+                  <input class="a-input" type="number" step="5" [(ngModel)]="s.slot_step_min" /></label>
+                <label>Мин. гостей
+                  <input class="a-input" type="number" min="1" [(ngModel)]="s.min_party_size" /></label>
+                <label>Макс. гостей (больше → «позвоните»)
+                  <input class="a-input" type="number" min="1" [(ngModel)]="s.max_party_size" /></label>
+                <label>Дней вперёд
+                  <input class="a-input" type="number" [(ngModel)]="s.advance_booking_days" /></label>
+                <label>Мин. время до брони, мин
+                  <input class="a-input" type="number" [(ngModel)]="s.min_lead_time_min" /></label>
+                <label>Держать pending, мин
+                  <input class="a-input" type="number" [(ngModel)]="s.hold_pending_min" /></label>
+                <label>Бесплатная отмена, часов
+                  <input class="a-input" type="number" [(ngModel)]="s.cancellation_hours" /></label>
+              </div>
+
+              <label>Телефон (для «позвоните нам»)
+                <input class="a-input" [(ngModel)]="s.phone" /></label>
+
+              <button class="a-btn primary" (click)="saveSettings()">Сохранить</button>
+            </div>
+          }
+        }
+
+        <!-- ==================== ВИДЖЕТ ==================== -->
+        @case ('widget') {
+          <h1 class="a-h1">White-label виджет</h1>
+          @if (widgetCfg(); as c) {
+            <div class="a-form">
+              <label>Slug (URL виджета)
+                <input class="a-input" [(ngModel)]="c.slug" /></label>
+
+              <div class="a-grid2">
+                <label>Основной цвет
+                  <input class="a-input color" type="color" [(ngModel)]="c.primary_color" /></label>
+                <label>Цвет текста
+                  <input class="a-input color" type="color" [(ngModel)]="c.text_color" /></label>
+                <label>Фон
+                  <input class="a-input color" type="color" [(ngModel)]="c.bg_color" /></label>
+                <label>Фон полей
+                  <input class="a-input color" type="color" [(ngModel)]="c.form_control_color" /></label>
+                <label>Google-шрифт
+                  <input class="a-input" [(ngModel)]="c.font" placeholder="Montserrat" /></label>
+                <label>Углы
+                  <select class="a-input" [(ngModel)]="c.corner_style">
+                    <option value="rounded">скруглённые</option>
+                    <option value="square">прямые</option>
+                  </select></label>
+                <label>Язык по умолчанию
+                  <select class="a-input" [(ngModel)]="c.default_lang">
+                    <option value="en">EN</option><option value="ru">RU</option><option value="lv">LV</option>
+                  </select></label>
+                <label>Логотип (URL)
+                  <input class="a-input" [(ngModel)]="c.logo_url" placeholder="https://…" /></label>
+              </div>
+
+              <label>Правила бронирования (policy)
+                <textarea class="a-input" rows="6" [(ngModel)]="c.policy_text"></textarea></label>
+
+              <button class="a-btn primary" (click)="saveWidgetCfg()">Сохранить брендинг</button>
+
+              <h2 class="a-h2">Встраивание на сайт ресторана</h2>
+              <p>Redirect-ссылка: <a [href]="widgetUrl()" target="_blank">{{ widgetUrl() }}</a></p>
+              <p class="a-hint">Или iframe-сниппет:</p>
+              <pre class="a-snippet">{{ embedSnippet() }}</pre>
+              <button class="a-btn" (click)="copyEmbed()">Скопировать сниппет</button>
+            </div>
+          }
+        }
+      }
+    </main>
+  </div>
+}

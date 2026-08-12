@@ -1,0 +1,218 @@
+@if (loadError()) {
+  <div class="w-shell"><div class="w-error-page">Widget not found</div></div>
+} @else if (!cfg()) {
+  <div class="w-shell"><div class="w-error-page">{{ i18n.t('loading') }}</div></div>
+} @else {
+  <div class="w-shell">
+    <div class="w-columns">
+
+      <!-- left: venue info -->
+      <section class="w-card w-info">
+        <div class="w-lang">
+          @for (l of ['en', 'ru', 'lv']; track l) {
+            <button class="w-lang-btn" [class.active]="i18n.lang() === l" (click)="setLang($any(l))">
+              {{ l.toUpperCase() }}
+            </button>
+          }
+        </div>
+
+        @if (cfg()!.logo_url) {
+          <img class="w-logo" [src]="cfg()!.logo_url" alt="" />
+        }
+        <h1 class="w-venue-name">{{ cfg()!.venue_name }}</h1>
+        <p class="w-address">{{ cfg()!.address }}</p>
+
+        @if (policyParagraphs().length) {
+          <h2 class="w-h2">{{ i18n.t('booking_policy') }}</h2>
+          <div class="w-policy" [class.expanded]="policyExpanded()">
+            @for (p of policyParagraphs(); track $index) {
+              <p>{{ p }}</p>
+            }
+          </div>
+          <button class="w-link" (click)="policyExpanded.set(!policyExpanded())">
+            {{ policyExpanded() ? i18n.t('show_less') : i18n.t('show_more') }}
+          </button>
+        }
+
+        @if (cfg()!.info_items.length) {
+          <h2 class="w-h2">{{ i18n.t('information') }}</h2>
+          <div class="w-info-grid">
+            @for (item of cfg()!.info_items; track item.title) {
+              <div class="w-info-item">
+                <span class="w-info-icon">{{ infoIcon(item.icon) }}</span>
+                <div>
+                  <div class="w-info-title">{{ item.title }}</div>
+                  <div class="w-info-text">{{ item.text }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- right: booking flow -->
+      <section class="w-card w-booking">
+
+        @switch (step()) {
+          @case ('slot') {
+            <!-- month + week strip -->
+            <div class="w-month-row">
+              <button class="w-nav-btn" (click)="prevWeek()" [disabled]="!canGoPrev()">‹</button>
+              <span class="w-month">{{ i18n.monthLabel(weekDays()[3]) }}</span>
+              <button class="w-nav-btn" (click)="nextWeek()">›</button>
+            </div>
+
+            <div class="w-week">
+              @for (d of weekDays(); track d.getTime()) {
+                <div class="w-day-col">
+                  <span class="w-day-name">{{ i18n.weekdayShort(d) }}</span>
+                  <button class="w-day"
+                          [class.selected]="isSelected(d)"
+                          [disabled]="isPast(d) || isTooFar(d)"
+                          (click)="selectDate(d)">
+                    {{ d.getDate() }}
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- guests -->
+            <div class="w-selects">
+              <label class="w-select-wrap">
+                <span class="w-select-icon">👤</span>
+                <select class="w-select" [ngModel]="partySize()"
+                        (ngModelChange)="partySize.set($event); onPartyChange()">
+                  @for (n of partyOptions(); track n) {
+                    <option [ngValue]="n">{{ n }} {{ n === 1 ? i18n.t('guest_one') : i18n.t('guests') }}</option>
+                  }
+                </select>
+              </label>
+              @if (selectedSlot(); as slot) {
+                <div class="w-select-wrap w-time-display">
+                  <span class="w-select-icon">🕐</span><span>{{ slot.time }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- group too large hint -->
+            @if (cfg()!.booking.phone) {
+              <p class="w-call-hint">
+                {{ i18n.t('call_us_large') }} <a [href]="'tel:' + cfg()!.booking.phone">{{ cfg()!.booking.phone }}</a>
+              </p>
+            }
+
+            @if (formError()) {
+              <p class="w-form-error">{{ formError() }}</p>
+            }
+
+            <!-- slots -->
+            <div class="w-slots-header">
+              <span class="w-h3">{{ i18n.t('select_time') }}</span>
+              @if ((slots()?.length ?? 0) > 4) {
+                <button class="w-link" (click)="showAllSlots.set(!showAllSlots())">
+                  {{ showAllSlots() ? i18n.t('show_less') : i18n.t('show_more') }} ›
+                </button>
+              }
+            </div>
+
+            @if (!selectedDate()) {
+              <p class="w-hint">📅 {{ i18n.t('pick_date') }}</p>
+            } @else if (slotsLoading()) {
+              <p class="w-hint">{{ i18n.t('loading') }}</p>
+            } @else if ((slots()?.length ?? 0) === 0) {
+              <p class="w-hint">{{ i18n.t('no_slots') }}</p>
+            } @else {
+              <div class="w-slot-grid">
+                @for (s of visibleSlots(); track s.time) {
+                  <button class="w-slot" [class.selected]="selectedSlot() === s" (click)="pickSlot(s)">
+                    {{ s.time }}
+                  </button>
+                }
+              </div>
+            }
+
+            <button class="w-primary-btn" [disabled]="!selectedSlot()" (click)="goToDetails()">
+              {{ i18n.t('continue_') }}
+            </button>
+          }
+
+          @case ('details') {
+            <button class="w-link w-back" (click)="step.set('slot')">‹ {{ i18n.t('back') }}</button>
+            <h2 class="w-h2">{{ i18n.t('your_details') }}</h2>
+            <p class="w-summary">
+              {{ i18n.t('booking_for') }} {{ partySize() }} {{ partySize() === 1 ? i18n.t('guest_one') : i18n.t('guests') }}
+              · {{ slotDateLabel() }} {{ i18n.t('at') }} {{ selectedSlot()?.time }}
+            </p>
+
+            <label class="w-field">
+              <span>{{ i18n.t('name') }} *</span>
+              <input class="w-input" [(ngModel)]="guestName" autocomplete="name" />
+            </label>
+            <label class="w-field">
+              <span>{{ i18n.t('phone') }}</span>
+              <input class="w-input" [(ngModel)]="guestPhone" autocomplete="tel" placeholder="+371" />
+            </label>
+            <label class="w-field">
+              <span>{{ i18n.t('email') }}</span>
+              <input class="w-input" type="email" [(ngModel)]="guestEmail" autocomplete="email" />
+            </label>
+            <label class="w-field">
+              <span>{{ i18n.t('special_request') }}</span>
+              <textarea class="w-input" rows="3" [(ngModel)]="specialRequest"></textarea>
+            </label>
+
+            @if (formError()) {
+              <p class="w-form-error">{{ formError() }}</p>
+            }
+
+            <button class="w-primary-btn" [disabled]="submitting()" (click)="submit()">
+              {{ submitting() ? i18n.t('loading') : i18n.t('confirm_booking') }}
+            </button>
+          }
+
+          @case ('success') {
+            @if (reservation(); as res) {
+              <div class="w-result">
+                <div class="w-result-icon" [class.pending]="res.status === 'pending'">
+                  {{ res.status === 'confirmed' ? '✓' : '⏳' }}
+                </div>
+                <h2 class="w-h2">
+                  {{ res.status === 'confirmed' ? i18n.t('confirmed_title') : i18n.t('pending_title') }}
+                </h2>
+                @if (res.status === 'pending') {
+                  <p class="w-hint">{{ i18n.t('pending_note') }}</p>
+                }
+                <p class="w-summary">
+                  {{ cfg()!.venue_name }}<br />
+                  {{ reservationDateLabel() }}<br />
+                  {{ res.party_size }} {{ res.party_size === 1 ? i18n.t('guest_one') : i18n.t('guests') }}
+                </p>
+                <div class="w-code">
+                  <span>{{ i18n.t('your_code') }}</span>
+                  <strong>{{ res.confirmation_code }}</strong>
+                </div>
+                @if (formError()) {
+                  <p class="w-form-error">{{ formError() }}</p>
+                }
+                <button class="w-secondary-btn" [disabled]="cancelling()" (click)="cancelReservation()">
+                  {{ i18n.t('cancel_booking') }}
+                </button>
+                <button class="w-link" (click)="startOver()">{{ i18n.t('new_booking') }}</button>
+              </div>
+            }
+          }
+
+          @case ('cancelled') {
+            <div class="w-result">
+              <div class="w-result-icon cancelled">✕</div>
+              <h2 class="w-h2">{{ i18n.t('cancelled_title') }}</h2>
+              <button class="w-primary-btn" (click)="startOver()">{{ i18n.t('new_booking') }}</button>
+            </div>
+          }
+        }
+
+        <div class="w-footer">{{ i18n.t('partnered') }} <strong>BUZZ</strong></div>
+      </section>
+    </div>
+  </div>
+}

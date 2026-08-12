@@ -1,0 +1,27 @@
+/* Global reset + BUZZ base palette (снята с debuzz-test.web.app) */
+:root {
+  --buzz-primary: #ff5934;
+  --buzz-primary-bg: #ffe5e0;
+  --buzz-text: #191926;
+  --buzz-muted: #63637e;
+  --buzz-border: #e2e8f0;
+  --buzz-surface: #f0f0f0;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  color: var(--buzz-text);
+  background: #fafafa;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; }
