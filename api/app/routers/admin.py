@@ -237,7 +237,8 @@ def get_widget_config(venue_id: int, db: Session = Depends(get_db)):
         bg_color=cfg.bg_color, form_control_color=cfg.form_control_color, font=cfg.font,
         corner_style=cfg.corner_style, text_alignment=cfg.text_alignment,
         default_lang=cfg.default_lang, logo_url=cfg.logo_url,
-        policy_text=cfg.policy_text, info_items=cfg.info_items or [])
+        photo_url=cfg.photo_url, policy_text=cfg.policy_text,
+        info_items=cfg.info_items or [])
 
 
 @router.put("/venues/{venue_id}/widget-config", response_model=WidgetConfigIn)

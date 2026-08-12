@@ -23,6 +23,9 @@
 
       <!-- left: venue info -->
       <section class="w-card w-info">
+        @if (cfg()!.photo_url) {
+          <img class="w-cover" [src]="cfg()!.photo_url" alt="" />
+        }
         @if (cfg()!.logo_url) {
           <img class="w-logo" [src]="cfg()!.logo_url" alt="" />
         }

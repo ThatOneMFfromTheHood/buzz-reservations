@@ -9,6 +9,10 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () => import('./admin/admin-page').then(m => m.AdminPage),
   },
+  {
+    path: 'app-demo',
+    loadComponent: () => import('./app-demo/app-demo-page').then(m => m.AppDemoPage),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'widget/riviera' },
   { path: '**', redirectTo: 'widget/riviera' },
 ];

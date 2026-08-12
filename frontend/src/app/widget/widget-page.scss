@@ -89,6 +89,15 @@
   }
 }
 
+.w-cover {
+  width: calc(100% + 56px);
+  margin: -28px -28px 20px;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+  display: block;
+  border-radius: calc(var(--w-radius, 12px) - 1px) calc(var(--w-radius, 12px) - 1px) 0 0;
+}
+
 .w-logo { max-height: 56px; margin-bottom: 12px; }
 
 .w-venue-name {

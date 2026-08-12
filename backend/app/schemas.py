@@ -98,6 +98,7 @@ class WidgetConfigOut(BaseModel):
     text_alignment: str
     default_lang: str
     logo_url: str | None
+    photo_url: str | None
     policy_text: str
     info_items: list[InfoItem]
     booking: BookingConfigOut
@@ -172,6 +173,7 @@ class WidgetConfigIn(BaseModel):
     text_alignment: str = "left"
     default_lang: str = "en"
     logo_url: str | None = None
+    photo_url: str | None = None
     policy_text: str = ""
     info_items: list[InfoItem] = []
 

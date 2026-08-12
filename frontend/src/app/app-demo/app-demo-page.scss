@@ -1,0 +1,285 @@
+/* Демо-стенд: телефонная рамка с карточкой заведения BUZZ-аппа (по скрину). */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--buzz-bg);
+}
+
+.d-stage {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+  justify-content: center;
+
+  @media (max-width: 860px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.d-caption {
+  max-width: 420px;
+  position: sticky;
+  top: 48px;
+
+  h1 { font-size: 36px; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  p { font-size: 16px; line-height: 1.6; color: var(--buzz-muted); }
+  strong { color: var(--buzz-text); }
+  code { color: var(--buzz-primary); font-size: 14px; }
+
+  .d-muted { font-size: 14px; }
+}
+
+/* --- phone frame -------------------------------------------------------------- */
+
+.d-phone {
+  position: relative;
+  width: 400px;
+  max-width: 100%;
+  height: 820px;
+  background: #0d0d12;
+  border: 1px solid var(--buzz-line);
+  border-radius: 32px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.04), 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.d-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.d-status-icons { opacity: 0.8; font-size: 11px; }
+
+.d-appbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+}
+
+.d-icon-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+
+  &:hover { background: rgba(255, 255, 255, 0.08); }
+}
+
+.d-appbar-actions { display: flex; gap: 4px; }
+
+.d-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 8px;
+}
+
+.d-tab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  padding: 8px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 2px solid transparent;
+
+  .d-tab-icon { font-size: 17px; }
+
+  &.active {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+}
+
+.d-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.d-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+
+  img {
+    width: 100%;
+    flex-shrink: 0;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    scroll-snap-align: center;
+  }
+}
+
+.d-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: -18px;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 8px;
+}
+
+.d-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+
+  &.active { background: #fff; }
+}
+
+.d-meta {
+  padding: 14px 18px 4px;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+.d-star { color: var(--buzz-primary); }
+
+.d-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 14px 18px;
+}
+
+.d-h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 4px 18px 10px;
+}
+
+.d-hours-label {
+  padding: 6px 18px 2px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.d-hours-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 18px;
+  font-size: 14.5px;
+
+  &.muted { color: rgba(255, 255, 255, 0.75); }
+}
+
+.d-open { color: #4ade80; font-weight: 600; }
+
+.d-spacer { height: 20px; }
+
+.d-cta {
+  padding: 12px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d0d12;
+}
+
+.d-book-btn {
+  width: 100%;
+  border: none;
+  background: var(--buzz-primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 4px var(--buzz-primary-glow);
+
+  &:hover { filter: brightness(1.08); }
+}
+
+.d-cta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.d-call-btn {
+  border: none;
+  background: #fff;
+  color: #0d0d12;
+  font-size: 15.5px;
+  font-weight: 600;
+  padding: 13px;
+  border-radius: 12px;
+}
+
+.d-road-btn {
+  border: none;
+  background: var(--buzz-primary);
+  color: #fff;
+  font-size: 15.5px;
+  font-weight: 600;
+  padding: 13px;
+  border-radius: 12px;
+  opacity: 0.92;
+}
+
+/* --- in-app browser sheet -------------------------------------------------------- */
+
+.d-sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--buzz-bg);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  animation: d-slide-up 0.25s ease;
+}
+
+@keyframes d-slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.d-sheet-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .d-icon-btn { font-size: 16px; }
+}
+
+.d-sheet-url {
+  flex: 1;
+  text-align: center;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.d-sheet-gap { width: 40px; }
+
+.d-sheet iframe {
+  flex: 1;
+  border: none;
+  width: 100%;
+  background: var(--buzz-bg);
+}

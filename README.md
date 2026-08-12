@@ -43,9 +43,13 @@ npm start
 ```
 
 - Виджет: http://localhost:4200/widget/riviera (auto-confirm, EN) и
-  http://localhost:4200/widget/gongu-riga-latvia (manual, RU, взрослые+дети в party_size)
+  http://localhost:4200/widget/gongu-riga-latvia (manual, RU)
+- Демо in-app флоу (ТЗ §8): http://localhost:4200/app-demo — карточка заведения
+  как в приложении BUZZ с кнопкой «Book a table», открывающей виджет
 - Админка: http://localhost:4200/admin (токен прототипа: `dev-admin`)
 - API-доки: http://localhost:8000/docs
+- Фото заведений/блюд сгенерированы (Recraft V4.1 через Higgsfield), лежат в
+  `frontend/public/img/`, обложка виджета — `widget_configs.photo_url`
 
 ## Тесты
 

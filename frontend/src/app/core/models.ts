@@ -52,6 +52,7 @@ export interface WidgetConfig {
   text_alignment: string;
   default_lang: Lang;
   logo_url: string | null;
+  photo_url: string | null;
   policy_text: string;
   info_items: InfoItem[];
   booking: BookingConfig;
@@ -124,6 +125,7 @@ export interface WidgetConfigAdmin {
   text_alignment: string;
   default_lang: Lang;
   logo_url: string | null;
+  photo_url: string | null;
   policy_text: string;
   info_items: InfoItem[];
 }

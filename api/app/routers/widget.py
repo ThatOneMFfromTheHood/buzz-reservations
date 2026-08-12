@@ -23,6 +23,6 @@ def get_widget_config(slug: str, db: Session = Depends(get_db)):
         form_control_color=cfg.form_control_color, font=cfg.font,
         corner_style=cfg.corner_style, text_alignment=cfg.text_alignment,
         default_lang=cfg.default_lang, logo_url=cfg.logo_url,
-        policy_text=cfg.policy_text,
+        photo_url=cfg.photo_url, policy_text=cfg.policy_text,
         info_items=[InfoItem(**i) for i in (cfg.info_items or [])],
         booking=booking_config(db, venue))

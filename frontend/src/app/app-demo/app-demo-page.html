@@ -1,0 +1,90 @@
+<div class="d-stage">
+  <div class="d-caption">
+    <h1>In-app booking — демо интеграции</h1>
+    <p>Флоу 1 из ТЗ: карточка заведения в приложении BUZZ получает кнопку
+      <strong>Book a table</strong>, которая открывает white-label виджет бронирования.</p>
+    <p class="d-muted">Кнопка показывается только если у заведения включено онлайн-бронирование
+      (<code>booking_enabled</code>).</p>
+  </div>
+
+  <div class="d-phone">
+    <div class="d-status">
+      <span>{{ now() }}</span>
+      <span class="d-status-icons">📶 🔋</span>
+    </div>
+
+    <div class="d-appbar">
+      <button class="d-icon-btn">‹</button>
+      <span class="d-appbar-actions">
+        <button class="d-icon-btn">⤴</button>
+        <button class="d-icon-btn">♡</button>
+      </span>
+    </div>
+
+    <div class="d-tabs">
+      @for (t of tabs; track t.name) {
+        <button class="d-tab" [class.active]="activeTab() === t.name" (click)="activeTab.set(t.name)">
+          <span class="d-tab-icon">{{ t.icon }}</span>
+          <span>{{ t.name }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="d-scroll">
+      <div class="d-carousel" #car (scroll)="onCarouselScroll(car)">
+        @for (p of photos; track p) {
+          <img [src]="p" alt="" />
+        }
+      </div>
+      <div class="d-dots">
+        @for (p of photos; track $index) {
+          <span class="d-dot" [class.active]="slide() === $index"></span>
+        }
+      </div>
+
+      <div class="d-meta">
+        <span class="d-star">★</span> 4.6&nbsp;&nbsp;•&nbsp;&nbsp;98 Reviews&nbsp;&nbsp;•&nbsp;&nbsp;$$&nbsp;&nbsp;•&nbsp;&nbsp;European&nbsp;&nbsp;•&nbsp;&nbsp;🍸 Bars
+      </div>
+
+      <div class="d-divider"></div>
+
+      <h2 class="d-h2">Hours</h2>
+      <div class="d-hours-label">Today</div>
+      <div class="d-hours-row">
+        <span class="d-open">Open</span>
+        <span>12:00 – 23:00</span>
+      </div>
+      <div class="d-hours-label">Normal hours</div>
+      @for (row of weekHours; track row.d) {
+        <div class="d-hours-row muted">
+          <span>{{ row.d }}</span>
+          <span>{{ row.h }}</span>
+        </div>
+      }
+
+      <div class="d-spacer"></div>
+    </div>
+
+    <div class="d-cta">
+      @if (booking()?.booking_enabled) {
+        <button class="d-book-btn" (click)="openSheet()">Book a table</button>
+      }
+      <div class="d-cta-row">
+        <button class="d-call-btn">Call</button>
+        <button class="d-road-btn">Make a Road</button>
+      </div>
+    </div>
+
+    <!-- in-app browser sheet с виджетом -->
+    @if (sheetOpen()) {
+      <div class="d-sheet">
+        <div class="d-sheet-bar">
+          <button class="d-icon-btn" (click)="closeSheet()">✕</button>
+          <span class="d-sheet-url">🔒 buzz-reservations.vercel.app</span>
+          <span class="d-sheet-gap"></span>
+        </div>
+        <iframe [src]="widgetUrl" title="Booking widget"></iframe>
+      </div>
+    }
+  </div>
+</div>

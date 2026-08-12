@@ -177,6 +177,7 @@ class WidgetConfig(Base):
     text_alignment: Mapped[str] = mapped_column(String(10), default="left")
     default_lang: Mapped[str] = mapped_column(String(5), default="en")
     logo_url: Mapped[str | None] = mapped_column(String(400), nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(String(400), nullable=True)  # обложка заведения
     policy_text: Mapped[str] = mapped_column(Text, default="")
     info_items: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
