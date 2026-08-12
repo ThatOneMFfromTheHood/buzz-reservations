@@ -28,6 +28,7 @@ export class WidgetPage implements OnInit {
 
   readonly cfg = signal<WidgetConfig | null>(null);
   readonly loadError = signal(false);
+  readonly buzzLogoOk = signal(true);
 
   readonly step = signal<Step>('slot');
 
@@ -124,11 +125,13 @@ export class WidgetPage implements OnInit {
     root.style.setProperty('--w-text', text);
     root.style.setProperty('--w-bg', bg);
     root.style.setProperty('--w-form', formControl);
-    root.style.setProperty('--w-radius', corner === 'square' ? '2px' : '14px');
-    root.style.setProperty('--w-radius-sm', corner === 'square' ? '2px' : '10px');
-    root.style.setProperty('--w-font', `'${font}', 'Inter', system-ui, sans-serif`);
+    root.style.setProperty('--w-radius', corner === 'square' ? '2px' : '12px');
 
-    if (font && font !== 'Inter') {
+    // 'system' / 'Inter' / пусто = системный стек BUZZ, иначе Google Font
+    if (!font || ['system', 'System', 'Inter'].includes(font)) {
+      root.style.setProperty('--w-font', 'var(--buzz-font)');
+    } else {
+      root.style.setProperty('--w-font', `'${font}', var(--buzz-font)`);
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700&display=swap`;

@@ -1,11 +1,16 @@
-/* Global reset + BUZZ base palette (снята с debuzz-test.web.app) */
+/* BUZZ design system — 1:1 с debuzz-test.web.app */
 :root {
   --buzz-primary: #ff5934;
-  --buzz-primary-bg: #ffe5e0;
-  --buzz-text: #191926;
-  --buzz-muted: #63637e;
-  --buzz-border: #e2e8f0;
-  --buzz-surface: #f0f0f0;
+  --buzz-primary-glow: rgba(255, 68, 0, 0.18);
+  --buzz-bg: #191926;
+  --buzz-bg-deep: #070718;
+  --buzz-text: #ffffff;
+  --buzz-muted: rgba(255, 255, 255, 0.55);
+  --buzz-muted-2: #63637e;
+  --buzz-line: rgba(255, 255, 255, 0.16);
+  --buzz-card: rgba(255, 255, 255, 0.04);
+  --buzz-font: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 * { box-sizing: border-box; }
@@ -16,10 +21,13 @@ html, body {
   min-height: 100%;
 }
 
+html { background: var(--buzz-bg); }
+
 body {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--buzz-font);
+  font-size: 16px;
   color: var(--buzz-text);
-  background: #fafafa;
+  background: var(--buzz-bg);
   -webkit-font-smoothing: antialiased;
 }
 

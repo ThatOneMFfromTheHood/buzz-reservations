@@ -77,16 +77,18 @@ def seed() -> None:
             db.add(VenueHours(venue_id=gongu.id, weekday=wd,
                               open_time="18:00", close_time="23:00"))
 
+        # BUZZ-палитра по умолчанию (1:1 с debuzz-test.web.app); ресторан может
+        # переопределить цвета в админке — white-label механика сохранена.
         db.add_all([
             WidgetConfig(venue_id=riviera.id, slug="riviera",
-                         primary_color="#0f4c5c", text_color="#191926", bg_color="#ffffff",
-                         form_control_color="#f0f0f0", font="Inter",
+                         primary_color="#ff5934", text_color="#ffffff", bg_color="#191926",
+                         form_control_color="#191926", font="system",
                          corner_style=CornerStyle.rounded, text_alignment="left",
                          default_lang="en", policy_text=RIVIERA_POLICY,
                          info_items=RIVIERA_INFO),
             WidgetConfig(venue_id=gongu.id, slug="gongu-riga-latvia",
-                         primary_color="#ff5934", text_color="#3f3428", bg_color="#efe9df",
-                         form_control_color="#f7f3ec", font="Montserrat",
+                         primary_color="#ff5934", text_color="#ffffff", bg_color="#191926",
+                         form_control_color="#191926", font="system",
                          corner_style=CornerStyle.rounded, text_alignment="left",
                          default_lang="ru",
                          policy_text="Если вы планируете бронирование для 5 и более человек, свяжитесь с нами: +371 20569922",

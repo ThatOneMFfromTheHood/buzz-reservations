@@ -3,19 +3,26 @@
 } @else if (!cfg()) {
   <div class="w-shell"><div class="w-error-page">{{ i18n.t('loading') }}</div></div>
 } @else {
+  <header class="w-topbar">
+    @if (buzzLogoOk()) {
+      <img class="w-topbar-logo" src="https://debuzz-test.web.app/assets/images/logo-light.png"
+           alt="BUZZ" (error)="buzzLogoOk.set(false)" />
+    } @else {
+      <span class="w-topbar-logo-text">BUZZ</span>
+    }
+    <div class="w-lang">
+      @for (l of ['en', 'ru', 'lv']; track l) {
+        <button class="w-lang-btn" [class.active]="i18n.lang() === l" (click)="setLang($any(l))">
+          {{ l.toUpperCase() }}
+        </button>
+      }
+    </div>
+  </header>
   <div class="w-shell">
     <div class="w-columns">
 
       <!-- left: venue info -->
       <section class="w-card w-info">
-        <div class="w-lang">
-          @for (l of ['en', 'ru', 'lv']; track l) {
-            <button class="w-lang-btn" [class.active]="i18n.lang() === l" (click)="setLang($any(l))">
-              {{ l.toUpperCase() }}
-            </button>
-          }
-        </div>
-
         @if (cfg()!.logo_url) {
           <img class="w-logo" [src]="cfg()!.logo_url" alt="" />
         }
