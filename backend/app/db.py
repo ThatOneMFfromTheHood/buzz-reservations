@@ -6,11 +6,14 @@ we rely on SELECT ... FOR UPDATE, on SQLite on BEGIN IMMEDIATE (single
 writer), both wrapped in one transaction.
 """
 import os
+from pathlib import Path
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DB_URL = os.environ.get("BUZZ_DB_URL", "sqlite:///./buzz_reservations.db")
+# default DB lives next to the backend package, not in the process cwd
+_DEFAULT_DB = Path(__file__).resolve().parent.parent / "buzz_reservations.db"
+DB_URL = os.environ.get("BUZZ_DB_URL", f"sqlite:///{_DEFAULT_DB.as_posix()}")
 
 engine = create_engine(
     DB_URL,

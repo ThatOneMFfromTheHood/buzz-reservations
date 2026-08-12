@@ -28,8 +28,12 @@
 
 .a-shell {
   display: grid;
-  grid-template-columns: 230px 1fr;
+  grid-template-columns: 230px minmax(0, 1fr);
   min-height: 100vh;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .a-sidebar {
@@ -41,6 +45,22 @@
   gap: 12px;
 
   .a-input { background: #26263a; border-color: #33334d; color: #fff; }
+
+  @media (max-width: 720px) {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+
+    .a-nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin-top: 4px;
+
+      button { padding: 8px 10px; font-size: 13px; }
+    }
+
+    .a-logout { display: none; }
+  }
 }
 
 .a-brand {
@@ -169,12 +189,15 @@ label {
 
 .a-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   align-items: flex-end;
   margin-bottom: 16px;
 
-  label { width: 180px; }
+  label { width: 180px; max-width: 100%; }
 }
+
+.a-main .a-table { display: block; overflow-x: auto; }
 
 .a-table {
   width: 100%;
